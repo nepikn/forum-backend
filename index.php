@@ -11,22 +11,25 @@
   <?php
   session_start();
 
-  $user_id = &$_SESSION['user_id'];
-  
-  if (isset($user_id)) :
-    require_once('db.php');
+  // unset($_SESSION['user']);
+  $user = ($_SESSION['user'] ??= ['err' => false]);
+  echo var_export($user);
 
-    $user = $mysqli->execute_query('SELECT * FROM users WHERE id = ?', [$user_id])->fetch_assoc();
+  if (isset($user['id'])) :
+    $name = htmlspecialchars($user['name']);
   ?>
     <nav>
       <form action="logout.php" method="post"><button>Log out</button></form>
     </nav>
     <article>post</article>
-    <form action="comment" method="post">
+    <div>
       <figure>
-        <figcaption><?= $user['name'] ?></figcaption>
+        <figcaption><?= $name ?></figcaption>
       </figure>
-    </form>
+      <form action="comment" method="post">
+        <textarea name="" id="" cols="30" rows="10"></textarea>
+      </form>
+    </div>
   <?php else : ?>
     <a href="auth.php">sign in or create account</a>
   <?php endif ?>

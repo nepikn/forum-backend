@@ -2,14 +2,26 @@
 session_start();
 require_once('db.php');
 
-$name_checking = empty($_POST['passwd']);
-if ($name_checking) {
-  $_SESSION['user'] = ['name' => $_POST['name']];
+// $mysqli->query('DELETE FROM users');
+$user = &$_SESSION['user'];
+$db = &$user['db'];
+$id = &$user['id'];
+$err = &$user['err'];
+$name = $_POST['name'];
+$passwd = $_POST['passwd'];
+
+if (empty($passwd)) {
+  $user['name'] = $name;
+  $db = $mysqli->execute_query('SELECT * FROM users WHERE name = ?', [$name])->fetch_assoc();
+} else if ($db === NULL) {
+  $mysqli->execute_query('INSERT INTO users VALUES (0, ?, ?)', [$name, password_hash($passwd, PASSWORD_DEFAULT)]);
+  $id = $mysqli->query('SELECT LAST_INSERT_ID()')->fetch_column(0);
+} else if (password_verify($passwd, $db['password'])) {
+  $err = false;
+  $id = $db['id'];
 } else {
-  // $mysqli->query('DELETE FROM users');
-  $mysqli->execute_query('INSERT INTO users VALUES (0, ?, ?)', [$_POST['name'], password_hash($_POST['name'], PASSWORD_DEFAULT)]);
-  $_SESSION['user']['id'] = $mysqli->query('SELECT LAST_INSERT_ID()')->fetch_column(0);
+  $err = true;
 }
 
-header(sprintf('Location: %s.php', $name_checking ? 'auth' : 'index'));
+header('Location: auth.php');
 exit;
