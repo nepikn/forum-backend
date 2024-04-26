@@ -11,13 +11,16 @@
   <?php
   session_start();
 
-  $user_id = $_SESSION['user_id'];
+  $user_id = &$_SESSION['user_id'];
+  
   if (isset($user_id)) :
-
     require_once('db.php');
 
     $user = $mysqli->execute_query('SELECT * FROM users WHERE id = ?', [$user_id])->fetch_assoc();
   ?>
+    <nav>
+      <form action="logout.php" method="post"><button>Log out</button></form>
+    </nav>
     <article>post</article>
     <form action="comment" method="post">
       <figure>

@@ -1,12 +1,15 @@
 <?php
+session_start();
 require_once('db.php');
 
-// $mysqli->query('DELETE FROM users');
-$mysqli->execute_query('INSERT INTO users VALUES (0, ?, ?)', [$_POST['name'], password_hash($_POST['password'], PASSWORD_DEFAULT)]);
+$name_checking = empty($_POST['passwd']);
+if ($name_checking) {
+  $_SESSION['user'] = ['name' => $_POST['name']];
+} else {
+  // $mysqli->query('DELETE FROM users');
+  $mysqli->execute_query('INSERT INTO users VALUES (0, ?, ?)', [$_POST['name'], password_hash($_POST['name'], PASSWORD_DEFAULT)]);
+  $_SESSION['user']['id'] = $mysqli->query('SELECT LAST_INSERT_ID()')->fetch_column(0);
+}
 
-session_start();
-
-$_SESSION['user_id'] = $mysqli->query('SELECT LAST_INSERT_ID()')->fetch_column(0);
-
-header('Location: index.php');
+header(sprintf('Location: %s.php', $name_checking ? 'auth' : 'index'));
 exit;
