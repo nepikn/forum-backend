@@ -11,7 +11,7 @@ $name = $_POST['name'];
 $passwd = $_POST['passwd'];
 
 if (empty($passwd)) {
-  $user['name'] = $name;
+  $user['name'] = htmlspecialchars($name);
   $db = $mysqli->execute_query('SELECT * FROM users WHERE name = ?', [$name])->fetch_assoc();
 } else if ($db === NULL) {
   $mysqli->execute_query('INSERT INTO users VALUES (0, ?, ?)', [$name, password_hash($passwd, PASSWORD_DEFAULT)]);

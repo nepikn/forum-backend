@@ -2,7 +2,7 @@
 session_start();
 
 $user = &$_SESSION['user'];
-echo var_export($user);
+echo var_export($user) . '<br/>';
 
 if (!isset($user) || isset($user['id'])) {
   header('Location: index.php');
