@@ -1,5 +1,5 @@
 <?php
-require_once('./db.php');
+require_once('./db/conn.php');
 session_start();
 // unset($_SESSION['user']);
 $user = ($_SESSION['user'] ??= ['err' => false]);
@@ -23,29 +23,29 @@ $user = ($_SESSION['user'] ??= ['err' => false]);
     <?php if (empty($user['id'])) : ?>
       <a href="auth.php">sign in or create account</a>
     <?php else : ?>
-      <form action="logout.php" method="post"><button>Log out</button></form>
+      <form action="./handler/logout.php" method="post"><button>Log out</button></form>
     <?php endif; ?>
   </nav>
 
   <?php
   foreach ($mysqli->query('SELECT * FROM comments') as $comment) {
-  $texts = [$mysqli
-  ->query(sprintf('SELECT name FROM users WHERE id = %d', $comment['user_id']))
-  ->fetch_column(), $comment['content']];
+    $texts = [$mysqli
+      ->query(sprintf('SELECT name FROM users WHERE id = %d', $comment['user_id']))
+      ->fetch_column(), $comment['content']];
 
-  array_walk($texts, fn (&$s) => $s = htmlspecialchars($s));
-  // array_map(fn (&$s) => htmlspecialchars($s), $texts);
-  // echo var_export($texts);
+    array_walk($texts, fn (&$s) => $s = htmlspecialchars($s));
+    // array_map(fn (&$s) => htmlspecialchars($s), $texts);
+    // echo var_export($texts);
 
-  printf(
-  '<article>
+    printf(
+      '<article>
     <figure>
       <figcaption>%s</figcaption>
     </figure>
     <p>%s</p>
   </article>',
-  ...$texts
-  );
+      ...$texts
+    );
   }
 
   if (empty($user['id'])) exit
@@ -55,7 +55,7 @@ $user = ($_SESSION['user'] ??= ['err' => false]);
     <figure>
       <figcaption><?= $user['name'] ?></figcaption>
     </figure>
-    <form action="comment.php" method="post">
+    <form action="./handler/comment.php" method="post">
       <textarea required name="content" id="" cols="30" rows="10"></textarea>
       <button>comment</button>
     </form>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once('db.php');
+require_once('../db/conn.php');
 
 // $mysqli->query('DELETE FROM users');
 $user = &$_SESSION['user'];
@@ -23,5 +23,5 @@ if (empty($passwd)) {
   $err = true;
 }
 
-header('Location: auth.php');
+header('Location: ../auth.php');
 exit;

@@ -5,29 +5,29 @@ $user = &$_SESSION['user'];
 echo var_export($user) . '<br/>';
 
 if (!isset($user) || isset($user['id'])) {
-  header('Location: index.php');
+  header('Location: ./index.php');
   exit;
 }
 
-$name = &$user['name'];
+$username = &$user['name'];
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forum</title>
 </head>
 
 <body>
-  <form action="user.php" method="post">
+  <form action="./handler/signin.php" method="post">
     <label for="name">name</label>
-    <?php if (empty($name)) : ?>
+    <?php if (empty($username)) : ?>
       <input type="text" name="name" required>
     <?php else : ?>
-      <input type="text" name="name" id="name" value="<?= $name ?>" readonly>
+      <input type="text" name="name" id="name" value="<?= $username ?>" readonly>
       <p>
         <?= $user['db'] === NULL ?
           'please create your password'

@@ -1,0 +1,22 @@
+CREATE DATABASE IF NOT EXISTS forum;
+
+USE forum;
+
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+  id INT UNSIGNED AUTO_INCREMENT,
+  name VARCHAR(9),
+  password VARCHAR(255),
+  PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS comments;
+
+CREATE TABLE comments (
+  id INT UNSIGNED AUTO_INCREMENT,
+  user_id INT UNSIGNED,
+  content VARCHAR(255),
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users (id)
+);
