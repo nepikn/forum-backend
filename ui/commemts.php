@@ -1,23 +1,25 @@
 <?php
-foreach ($mysqli->query('SELECT * FROM comments ORDER BY id DESC') as $comment) {
-  $strings = [
-    $mysqli
-      ->query(sprintf('SELECT name FROM users WHERE id = %d', $comment['user_id']))
-      ->fetch_column(),
-    $comment['content']
-  ];
+function printComments($template, $currentUserId)
+{
+  global $mysqli;
 
-  // array_walk($strings, fn (&$s) => $s = htmlspecialchars($s));
-  // array_map(fn ($s) => htmlspecialchars($s), $strings);
-  // echo var_export($strings);
+  foreach ($mysqli->query('SELECT * FROM comments ORDER BY id DESC') as $comment) {
+    $commentUserId = $comment['user_id'];
+    // $menu = $commentUserId != $currentUserId ? '' :
+    //   '<form>';
+    $userInputs = [
+      getUsername($mysqli, $commentUserId),
+      $comment['content']
+    ];
 
-  printf(
-    '<article>
-      <figure>
-        <figcaption>%s</figcaption>
-      </figure>
-      <p>%s</p>
-    </article>',
-    ...array_map('htmlspecialchars', $strings)
-  );
+    vprintf($template, array_map('htmlspecialchars', $userInputs));
+
+    // array_walk($strings, fn (&$s) => $s = htmlspecialchars($s));
+    // echo var_export($strings);
+  }
+}
+
+function UserMenu()
+{
+  return '';
 }

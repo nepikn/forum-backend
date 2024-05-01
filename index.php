@@ -1,5 +1,7 @@
 <?php
 require_once('./db/conn.php');
+require_once('./util/user.php');
+require_once('./ui/commemts.php');
 session_start();
 // unset($_SESSION['user']);
 $user = ($_SESSION['user'] ??= ['id' => null, 'err' => false,]);
@@ -34,12 +36,18 @@ $user_id = $user['id'];
     <?php endif ?>
   </nav>
 
+  <?php ob_start() ?>
+  <article>
+    <figure>
+      <figcaption>%s</figcaption>
+    </figure>
+    <p>%s</p>
+  </article>
   <?php
-  require('./ui/commemts.php');
+  printComments(ob_get_clean(), $user_id);
 
   if ($user_id) :
   ?>
-
     <div>
       <figure>
         <figcaption><?= $username ?></figcaption>
