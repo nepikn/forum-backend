@@ -28,28 +28,7 @@ $user = ($_SESSION['user'] ??= ['err' => false]);
   </nav>
 
   <?php
-  foreach ($mysqli->query('SELECT * FROM comments ORDER BY id DESC') as $comment) {
-    $texts = [
-      $mysqli
-        ->query(sprintf('SELECT name FROM users WHERE id = %d', $comment['user_id']))
-        ->fetch_column(),
-      $comment['content']
-    ];
-
-    array_walk($texts, fn (&$s) => $s = htmlspecialchars($s));
-    // array_map(fn (&$s) => htmlspecialchars($s), $texts);
-    // echo var_export($texts);
-
-    printf(
-      '<article>
-    <figure>
-      <figcaption>%s</figcaption>
-    </figure>
-    <p>%s</p>
-  </article>',
-      ...$texts
-    );
-  }
+  require('./ui/commemts.php');
 
   if (empty($user['id'])) exit
   ?>
