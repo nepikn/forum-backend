@@ -24,7 +24,11 @@ $user = ($_SESSION['user'] ??= ['err' => false]);
       <a href="auth.php">sign in or create account</a>
     <?php else : ?>
       <form action="./handler/logout.php" method="post"><button>Log out</button></form>
-    <?php endif; ?>
+      <form action="./handler/username_edit.php" method="post">
+        <input type="text" name="name">
+        <button>Edit Name</button>
+      </form>
+    <?php endif ?>
   </nav>
 
   <?php
