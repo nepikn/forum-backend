@@ -2,8 +2,8 @@
 require_once('./db/conn.php');
 session_start();
 // unset($_SESSION['user']);
-$user = ($_SESSION['user'] ??= ['err' => false]);
-// $user_id = &$user['id'];
+$user = ($_SESSION['user'] ??= ['id' => null, 'err' => false,]);
+$user_id = $user['id'];
 // $user_name = htmlspecialchars($user['name']);
 // echo var_export($user) . '<br/>';
 ?>
@@ -20,9 +20,12 @@ $user = ($_SESSION['user'] ??= ['err' => false]);
 
 <body>
   <nav>
-    <?php if (empty($user['id'])) : ?>
+    <?php if (!$user_id) : ?>
       <a href="auth.php">sign in or create account</a>
-    <?php else : ?>
+
+    <?php else :
+      $username = getUsername($mysqli, $user['id']);
+    ?>
       <form action="./handler/logout.php" method="post"><button>Log out</button></form>
       <form action="./handler/username_edit.php" method="post">
         <input type="text" name="name">
@@ -34,18 +37,19 @@ $user = ($_SESSION['user'] ??= ['err' => false]);
   <?php
   require('./ui/commemts.php');
 
-  if (empty($user['id'])) exit
+  if ($user_id) :
   ?>
 
-  <div>
-    <figure>
-      <figcaption><?= $user['name'] ?></figcaption>
-    </figure>
-    <form action="./handler/comment.php" method="post">
-      <textarea required name="content" id="" cols="30" rows="10"></textarea>
-      <button>comment</button>
-    </form>
-  </div>
+    <div>
+      <figure>
+        <figcaption><?= $username ?></figcaption>
+      </figure>
+      <form action="./handler/comment_add.php" method="post">
+        <textarea required name="content" id="" cols="30" rows="10"></textarea>
+        <button>comment</button>
+      </form>
+    </div>
+  <?php endif ?>
 </body>
 
 </html>

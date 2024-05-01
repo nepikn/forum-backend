@@ -15,7 +15,7 @@ if (empty($passwd)) {
   $db = $mysqli->execute_query('SELECT * FROM users WHERE name = ?', [$name])->fetch_assoc();
 } else if ($db === NULL) {
   $mysqli->execute_query('INSERT INTO users VALUES (0, ?, ?)', [$name, password_hash($passwd, PASSWORD_DEFAULT)]);
-  $id = $mysqli->query('SELECT LAST_INSERT_ID()')->fetch_column(0);
+  $id = $mysqli->query('SELECT LAST_INSERT_ID()')->fetch_column();
 } else if (password_verify($passwd, $db['password'])) {
   $err = false;
   $id = $db['id'];
