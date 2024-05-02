@@ -1,12 +1,14 @@
 <?php
 require_once('./db/conn.php');
 require_once('./util/user.php');
+require_once('./ui/nav.php');
 require_once('./ui/commemts.php');
+require_once('./ui/commentEditor.php');
 session_start();
 // unset($_SESSION['user']);
 $user = ($_SESSION['user'] ??= ['id' => null, 'err' => false,]);
 $user_id = $user['id'];
-// $user_name = htmlspecialchars($user['name']);
+$username = getUsername($user_id);
 // echo var_export($user) . '<br/>';
 ?>
 
@@ -21,43 +23,14 @@ $user_id = $user['id'];
 </head>
 
 <body>
-  <nav>
-    <?php if (!$user_id) : ?>
-      <a href="auth.php">sign in or create account</a>
-
-    <?php else :
-      $username = getUsername($mysqli, $user['id']);
-    ?>
-      <form action="./handler/logout.php" method="post"><button>Log out</button></form>
-      <form action="./handler/username_edit.php" method="post">
-        <input type="text" name="name">
-        <button>Edit Name</button>
-      </form>
-    <?php endif ?>
-  </nav>
-
-  <?php ob_start() ?>
-  <article>
-    <figure>
-      <figcaption>%s</figcaption>
-    </figure>
-    <p>%s</p>
-  </article>
   <?php
-  printComments(ob_get_clean(), $user_id);
+  printNav($username);
+  printComments($user_id);
 
-  if ($user_id) :
+  if ($user_id) {
+    printEditor($username);
+  }
   ?>
-    <div>
-      <figure>
-        <figcaption><?= $username ?></figcaption>
-      </figure>
-      <form action="./handler/comment_add.php" method="post">
-        <textarea required name="content" id="" cols="30" rows="10"></textarea>
-        <button>comment</button>
-      </form>
-    </div>
-  <?php endif ?>
 </body>
 
 </html>
