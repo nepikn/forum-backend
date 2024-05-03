@@ -1,18 +1,15 @@
 <?php
-function printEditor($username)
+function printInput($username)
 {
-  ob_start();
 ?>
-  <div>
+  <section>
     <figure>
-      <figcaption>%s</figcaption>
+      <figcaption><?= $username ?></figcaption>
     </figure>
     <form action="./handler/comment_add.php" method="post">
       <textarea required name="content" id="" cols="30" rows="10"></textarea>
       <button>comment</button>
     </form>
-  </div>
-
-<?php
-  printf(ob_get_clean(), $username);
+    </div>
+  <?php
 }
