@@ -3,7 +3,7 @@ require_once('./db/conn.php');
 require_once('./util/user.php');
 require_once('./ui/nav.php');
 require_once('./ui/commemts.php');
-require_once('./ui/commentEditor.php');
+require_once('./ui/comment_input.php');
 session_start();
 // unset($_SESSION['user']);
 $user = ($_SESSION['user'] ??= ['id' => null, 'err' => false,]);
@@ -28,7 +28,7 @@ $username = getUsername($user_id);
   printComments($user_id);
 
   if ($user_id) {
-    printEditor($username);
+    printInput($username);
   }
   ?>
 </body>

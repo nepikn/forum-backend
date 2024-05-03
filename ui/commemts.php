@@ -2,47 +2,63 @@
 function printComments($currentUserId)
 {
   global $mysqli;
-
-  $template = getCommentTemp();
-  $sql = 'SELECT * FROM comments ORDER BY id DESC';
+  $comments = $mysqli->query(
+    'SELECT
+      *
+    FROM
+      comments AS c
+      INNER JOIN (
+        SELECT
+          id AS user_id,
+          name AS user_name
+        FROM
+          users
+      ) AS u ON c.user_id = u.user_id
+    ORDER BY
+      c.id DESC'
+  );
 
   ob_start();
-  foreach ($mysqli->query($sql) as $comment) {
+  foreach ($comments as $comment) {
     $commentUserId = $comment['user_id'];
-    // $menu = $commentUserId != $currentUserId ? '' :
-    //   '<form>';
-    $userInputs = [
-      $comment['content']
-    ];
 
-    printf(
-      $template,
-      getUsername($commentUserId),
-      ...array_map('htmlspecialchars', $userInputs)
+    printComment(
+      $comment,
+      $commentUserId == $currentUserId
     );
-
-    // array_walk($strings, fn (&$s) => $s = htmlspecialchars($s));
-    // echo var_export($strings);
   }
-
   printf('<section>%s</section>', ob_get_clean());
 }
 
-function getCommentTemp()
+function printComment($comment, $byCurrentUser)
 {
-  ob_start();
+  $user_inputs = [$comment['user_name'], $comment['content']];
+  array_walk(
+    $user_inputs,
+    fn (&$s) => $s = htmlspecialchars($s)
+  );
 ?>
   <article>
+
     <figure>
-      <figcaption>%s</figcaption>
+      <figcaption><?= $user_inputs[0] ?></figcaption>
     </figure>
-    <p>%s</p>
+    <p><?= $user_inputs[1] ?></p>
+
+    <?php if ($byCurrentUser) : ?>
+      <form action="./handler/comment_edit.php" method="post">
+        <label for="commentEdit">Edit</label>
+        <input type="text" name="content" id="commentEdit">
+        <input type="hidden" name="commentId" value="<?= $comment['id'] ?>">
+        <button>Save</button>
+      </form>
+
+      <form action="../handler/comment_del.php" method="post">
+        <button>Delete</button>
+        <input type="hidden" name="commentId" value="<?= $comment['id'] ?>">
+      </form>
+    <?php endif ?>
+
   </article>
 <?php
-  return ob_get_clean();
-}
-
-function UserMenu()
-{
-  return '';
 }
