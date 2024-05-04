@@ -14,6 +14,7 @@ function printComments($currentUserId)
         FROM
           users
       ) AS u ON c.user_id = u.user_id
+    WHERE is_deleted IS NULL -- if soft deleting
     ORDER BY
       c.id DESC'
   );
@@ -38,7 +39,7 @@ function printComment($comment, $byCurrentUser)
     fn (&$s) => $s = htmlspecialchars($s)
   );
 ?>
-  <article>
+  <article class="card">
 
     <figure>
       <figcaption><?= $user_inputs[0] ?></figcaption>
@@ -53,7 +54,7 @@ function printComment($comment, $byCurrentUser)
         <button>Save</button>
       </form>
 
-      <form action="../handler/comment_del.php" method="post">
+      <form action="./handler/comment_del.php" method="post">
         <button>Delete</button>
         <input type="hidden" name="commentId" value="<?= $comment['id'] ?>">
       </form>

@@ -18,5 +18,8 @@ CREATE TABLE comments (
   user_id INT UNSIGNED,
   content VARCHAR(255),
   PRIMARY KEY (id),
-  FOREIGN KEY (user_id) REFERENCES users (id)
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
+
+ALTER TABLE comments
+ADD is_deleted BOOL;
