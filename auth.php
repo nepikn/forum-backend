@@ -22,12 +22,14 @@ $username = &$user['name'];
 </head>
 
 <body>
+  <form id="userSwitch" action="./handler/user_switch.php" method="post"></form>
   <form action="./handler/signin.php" method="post">
     <label for="name">name</label>
     <?php if (empty($username)) : ?>
       <input type="text" name="name" required>
     <?php else : ?>
       <input type="text" name="name" id="name" value="<?= $username ?>" readonly>
+      <button form="userSwitch">Switch User</button>
       <p>
         <?= $user['db'] === NULL ?
           'please create your password'
