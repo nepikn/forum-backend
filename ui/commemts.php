@@ -1,8 +1,8 @@
 <?php
-function printComments($currentUserId)
+function printComments($currentUserId, $page, $commentPerPage = 5)
 {
   global $mysqli;
-  $comments = $mysqli->query(
+  $comments = $mysqli->query(sprintf(
     'SELECT
       *
     FROM
@@ -16,8 +16,11 @@ function printComments($currentUserId)
       ) AS u ON c.user_id = u.user_id
     WHERE is_deleted IS NULL -- if soft deleting
     ORDER BY
-      c.id DESC'
-  );
+      c.id DESC
+    LIMIT %d, %d',
+    ($page - 1) * 10,
+    $commentPerPage
+  ));
 
   ob_start();
   foreach ($comments as $comment) {

@@ -26,7 +26,7 @@ $username = getUsername($user_id);
 <body>
   <?php
   printNav($username);
-  printComments($user_id);
+  printComments($user_id, $_GET['page'] ?? 1);
 
   if ($user_id) {
     printInput($username);
