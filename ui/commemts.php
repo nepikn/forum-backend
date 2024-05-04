@@ -4,7 +4,7 @@ function printComments($currentUserId, $page, $commentPerPage = 5)
   global $mysqli;
   $comments = $mysqli->query(sprintf(
     'SELECT
-      *
+      SQL_CALC_FOUND_ROWS *
     FROM
       comments AS c
       INNER JOIN (
@@ -18,7 +18,7 @@ function printComments($currentUserId, $page, $commentPerPage = 5)
     ORDER BY
       c.id DESC
     LIMIT %d, %d',
-    ($page - 1) * 10,
+    ($page - 1) * $commentPerPage,
     $commentPerPage
   ));
 
@@ -32,6 +32,10 @@ function printComments($currentUserId, $page, $commentPerPage = 5)
     );
   }
   printf('<section>%s</section>', ob_get_clean());
+  printPagination(
+    $page,
+    ceil($mysqli->query('SELECT FOUND_ROWS()')->fetch_column() / $commentPerPage)
+  );
 }
 
 function printComment($comment, $byCurrentUser)
@@ -64,5 +68,34 @@ function printComment($comment, $byCurrentUser)
     <?php endif ?>
 
   </article>
+<?php
+}
+
+function printPagination($page, $pageCount)
+{
+  $prev = max(1, $page - 1);
+  $next = min($pageCount, $page + 1);
+?>
+  <nav>
+    <ul>
+      <?php
+      printArrow($page == 1, 'Prev', $prev);
+      printArrow($page == $pageCount, 'Next', $next);
+      ?>
+    </ul>
+  </nav>
+<?php
+}
+
+function printArrow($atBoundry, $text, $targPage)
+{
+?>
+  <li>
+    <?php if ($atBoundry) : ?>
+      <span><?= $text ?></span>
+    <?php else : ?>
+      <a href="?page=<?= $targPage ?>"><?= $text ?></a>
+    <?php endif ?>
+  </li>
 <?php
 }
