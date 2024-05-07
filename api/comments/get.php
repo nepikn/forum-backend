@@ -1,9 +1,17 @@
 <?php
-function printComments($currentUserId, $page, $commentPerPage = 5)
-{
-  global $mysqli;
-  $comments = $mysqli->query(sprintf(
-    'SELECT
+require_once('../../db/conn.php');
+
+// printComments($_GET['page'], $_GET['commentPerPage']);
+
+// // function printComments($args)
+// function printComments($page, $commentPerPage)
+// {
+// global $mysqli;
+// $commentPerPage ??= 5;
+['page' => $page, 'commentPerPage' => $commentPerPage] = $_GET;
+
+$result = $mysqli->query(sprintf(
+  'SELECT
       SQL_CALC_FOUND_ROWS *
     FROM
       comments AS c
@@ -18,25 +26,35 @@ function printComments($currentUserId, $page, $commentPerPage = 5)
     ORDER BY
       c.id DESC
     LIMIT %d, %d',
-    ($page - 1) * $commentPerPage,
-    $commentPerPage
-  ));
+  ($page - 1) * $commentPerPage,
+  $commentPerPage
+));
 
-  ob_start();
-  foreach ($comments as $comment) {
-    $commentUserId = $comment['user_id'];
-
-    printComment(
-      $comment,
-      $commentUserId == $currentUserId
-    );
-  }
-  printf('<section>%s</section>', ob_get_clean());
-  printPagination(
-    $page,
-    ceil($mysqli->query('SELECT FOUND_ROWS()')->fetch_column() / $commentPerPage)
-  );
+$comments = [];
+foreach ($result as $comment) {
+  array_push($comments, $comment);
 }
+
+header('Access-Control-Allow-Origin: http://localhost:5173');
+header('Content-Type: application/json; charset=utf-8');
+
+echo json_encode($comments);
+
+// ob_start();
+// foreach ($comments as $comment) {
+//   $commentUserId = $comment['user_id'];
+
+//   printComment(
+//     $comment,
+//     $commentUserId == $currentUserId
+//   );
+// }
+// printf('<section>%s</section>', ob_get_clean());
+// printPagination(
+//   $page,
+//   ceil($mysqli->query('SELECT FOUND_ROWS()')->fetch_column() / $commentPerPage)
+// );
+// }
 
 function printComment($comment, $byCurrentUser)
 {
