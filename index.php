@@ -25,18 +25,7 @@ $username = getUsername($user_id);
 
 <body>
   <?php
-  printNav($username);
-  printComments($user_id, $_GET['page'] ?? 1);
-
-  if ($user_id) {
-    printInput($username);
-  }
   ?>
-  <!-- <script>
-    "use strict";
-    window.addEventListener('load', () => document.querySelector('sec').innerText = 'i');
-  </script> -->
-
 </body>
 
 </html>

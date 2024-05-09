@@ -1,44 +1,18 @@
 <?php
-require_once('../../db/conn.php');
+require_once('../controllers/comment.php');
 
-// printComments($_GET['page'], $_GET['commentPerPage']);
-
-// // function printComments($args)
-// function printComments($page, $commentPerPage)
-// {
-// global $mysqli;
-// $commentPerPage ??= 5;
-['page' => $page, 'commentPerPage' => $commentPerPage] = $_GET;
-
-$result = $mysqli->query(sprintf(
-  'SELECT
-      SQL_CALC_FOUND_ROWS *
-    FROM
-      comments AS c
-      INNER JOIN (
-        SELECT
-          id AS user_id,
-          name AS user_name
-        FROM
-          users
-      ) AS u ON c.user_id = u.user_id
-    WHERE is_deleted IS NULL -- if soft deleting
-    ORDER BY
-      c.id DESC
-    LIMIT %d, %d',
-  ($page - 1) * $commentPerPage,
-  $commentPerPage
-));
-
-$comments = [];
-foreach ($result as $comment) {
-  array_push($comments, $comment);
+switch ($_SERVER['REQUEST_METHOD']) {
+  case 'POST':
+    $controller->post();
+    break;
+  case 'GET':
+    get($_GET);
+    break;
+  default:
+    exit('unrecognized request method');
+    break;
 }
 
-header('Access-Control-Allow-Origin: http://localhost:5173');
-header('Content-Type: application/json; charset=utf-8');
-
-echo json_encode($comments);
 
 // ob_start();
 // foreach ($comments as $comment) {
