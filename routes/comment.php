@@ -1,17 +1,23 @@
 <?php
+require_once('../util/router.php');
 require_once('../controllers/comment.php');
 
-switch ($_SERVER['REQUEST_METHOD']) {
-  case 'POST':
-    $controller->post();
-    break;
-  case 'GET':
-    get($_GET);
-    break;
-  default:
-    exit('unrecognized request method');
-    break;
-}
+$router = new Router('/api/comment');
+
+$router->get('/', 'get');
+// $router->get('/:id', 'get');
+
+// switch ($_SERVER['REQUEST_METHOD']) {
+//   case 'POST':
+//     $controller->post();
+//     break;
+//   case 'GET':
+//     get($_GET);
+//     break;
+//   default:
+//     exit('unrecognized request method');
+//     break;
+// }
 
 
 // ob_start();

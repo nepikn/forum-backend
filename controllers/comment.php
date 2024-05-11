@@ -1,10 +1,10 @@
 <?php
 require_once('../db/conn.php');
 
-function get($queries)
+function get($req)
 {
   global $mysqli;
-  ['page' => $page, 'commentPerPage' => $commentPerPage] = $queries;
+  ['page' => $page, 'commentPerPage' => $commentPerPage] = $req['queries'];
 
   $result = $mysqli->query(sprintf(
     'SELECT
