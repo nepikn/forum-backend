@@ -4,8 +4,9 @@ header('content-type: text/plain');
 class Router
 {
   public $req = [];
+  public $valid_methods = ['POST', 'GET', 'PUT', 'DELETE'];
 
-  function __construct($path_base)
+  function __construct(string $path_base)
   {
     preg_match(
       '/([^?]+)(?:$|\?(.+))/',
@@ -25,8 +26,19 @@ class Router
     }
   }
 
-  function get($route, $handle)
+  // function get($route, $handle)
+  // {
+
+  //   // $this->handleReq(strtoupper(__FUNCTION__), $pattern, $handle);
+  // }
+
+  // function handleReq($method, $pattern, $handle)
+  function __call($method, $args)
   {
+    if (!in_array(strtoupper($method), $this->valid_methods)) throw new Exception('Invalid Method');
+    if (strtoupper($method) != $_SERVER['REQUEST_METHOD']) return;
+
+    [$route, $handle] = $args;
     $pattern = sprintf(
       '/^%s$/',
       str_replace('/', '\/', preg_replace(
@@ -35,13 +47,6 @@ class Router
         $route
       ))
     );
-
-    $this->handleReq(strtoupper(__FUNCTION__), $pattern, $handle);
-  }
-
-  function handleReq($method, $pattern, $handle)
-  {
-    if ($method != $_SERVER['REQUEST_METHOD']) return;
 
     preg_match(
       $pattern,
