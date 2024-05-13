@@ -1,8 +1,8 @@
 <?php
-require_once('../db/conn.php');
+require_once '../db/conn.php';
+require_once '../util/res.php';
 
-function get($req)
-{
+function get($req) {
   global $mysqli;
   ['page' => $page, 'commentPerPage' => $commentPerPage] = $req['queries'];
 
@@ -31,8 +31,5 @@ function get($req)
     array_push($comments, $comment);
   }
 
-  header('Access-Control-Allow-Origin: http://localhost:5173');
-  header('Content-Type: application/json; charset=utf-8');
-
-  echo json_encode($comments);
+  printJson($comments);
 }
