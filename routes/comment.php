@@ -4,8 +4,8 @@ require_once '../controllers/comment.php';
 
 $router = new Router('/api/comment');
 
-$router->get('', 'get');
-$router->get('/:id', 'get');
+$router->get('', 'getComments');
+$router->get('/:id', 'getComments');
 
 function printComment($comment, $byCurrentUser) {
   $user_inputs = [$comment['user_name'], $comment['content']];

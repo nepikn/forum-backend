@@ -2,7 +2,7 @@
 require_once '../db/conn.php';
 require_once '../util/res.php';
 
-function get($req) {
+function getComments($req) {
   global $mysqli;
   ['page' => $page, 'commentPerPage' => $commentPerPage] = $req['queries'];
 
@@ -31,5 +31,5 @@ function get($req) {
     array_push($comments, $comment);
   }
 
-  printJson($comments);
+  return $comments;
 }

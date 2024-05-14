@@ -2,20 +2,13 @@
 header('content-type: text/plain');
 
 class Router {
-  private $req = ['path' => '', 'queries' => null];
   public $valid_methods = ['POST', 'GET', 'PUT', 'DELETE'];
+  private $req = ['path' => '', 'queries' => null];
+  private $responses = [];
 
   function __construct(string $path_base) {
     $url = parse_url(str_replace($path_base, "", $_SERVER['REQUEST_URI']));
-    // var_export($url);
-    // preg_match(
-    //   '/(?<path>[^?]*)($|\?(?<queries>.+))/',
-    //   ,
-    //   $req_matches
-    // );
 
-    // $this->req['path'] = @$url['path'];
-    // $this->req['queries'] = @$url['query']?parse_str();
     if (@$url['path']) {
       $this->req['path'] = $url['path'];
     }
@@ -23,25 +16,26 @@ class Router {
       parse_str($url['query'], $this->req['queries']);
     }
 
-    // if (@$req_matches['queries']) {
-    //   foreach (explode('&', $req_matches['queries']) as $query) {
-    //     preg_match('/(\w+)=?(\w*)/', $query, $matches);
+    register_shutdown_function(function () {
+      switch (count($this->responses)) {
+      case 0:
+        respond(404);
+        break;
 
-    //     $this->req['queries'][$matches[1]] = $matches[2];
-    //   }
-    // }
+      case 1:
+        respond($this->responses[0]);
+        break;
+
+      default:
+        respond('server error: requested path matching mutiple routes', 500);
+        break;
+      }
+    });
   }
 
-  // function get($route, $handle)
-  // {
-
-  //   // $this->handleReq(strtoupper(__FUNCTION__), $pattern, $handle);
-  // }
-
-  // function handleReq($method, $pattern, $handle)
   function __call($method, $args) {
     if (!in_array(strtoupper($method), $this->valid_methods)) {
-      throw new Exception('Invalid Method');
+      throw new Exception('invalid method');
     }
     if (strtoupper($method) != $_SERVER['REQUEST_METHOD']) {
       return;
@@ -77,7 +71,7 @@ class Router {
       ...$this->req,
     ];
 
-    $handle($req);
+    array_push($this->responses, $handle($req));
     // var_export($req);
   }
 }

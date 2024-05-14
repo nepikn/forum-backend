@@ -10,4 +10,4 @@ $user_controller = new UserController($user_id);
 $router = new Router('/api/user');
 
 // $router->get('/name', );
-$router->get('/name', [$user_controller, 'printName']);
+$router->get('/name', [$user_controller, 'getName']);

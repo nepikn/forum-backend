@@ -8,16 +8,14 @@ class UserController {
     $this->id = $id;
   }
 
-  public function printName() {
+  public function getName($req) {
     global $mysqli;
-    $id = $this->id;
+    // $id = $this->id;
+    $id = @$req->queries['id'];
+    $name = $id === null ? null : htmlspecialchars(
+      $mysqli->query("SELECT name FROM users WHERE id = $id")->fetch_column()
+    );
 
-    // printJson('QAQ');
-    printJson($id === null ? null : htmlspecialchars(
-      $mysqli->query(vsprintf(
-        'SELECT name FROM users WHERE id = %s',
-        [$id]
-      ))->fetch_column()
-    ));
+    return $name;
   }
 }
