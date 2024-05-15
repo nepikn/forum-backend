@@ -1,5 +1,4 @@
 <?php
-header('content-type: text/plain');
 
 class Router {
   public $valid_methods = ['POST', 'GET', 'PUT', 'DELETE'];
@@ -18,17 +17,17 @@ class Router {
 
     register_shutdown_function(function () {
       switch (count($this->responses)) {
-      case 0:
-        respond(404);
-        break;
+        case 0:
+          respond(404);
+          break;
 
-      case 1:
-        respond($this->responses[0]);
-        break;
+        case 1:
+          respond($this->responses[0]);
+          break;
 
-      default:
-        respond('server error: requested path matching mutiple routes', 500);
-        break;
+        default:
+          respond('server error: requested path matching mutiple routes', 500);
+          break;
       }
     });
   }
@@ -65,7 +64,7 @@ class Router {
     $req = [
       'args' => array_filter(
         $matches,
-        fn($key) => is_string($key),
+        fn ($key) => is_string($key),
         ARRAY_FILTER_USE_KEY
       ),
       ...$this->req,
