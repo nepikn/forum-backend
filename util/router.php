@@ -4,6 +4,7 @@ class Router {
   public $valid_methods = ['POST', 'GET', 'PUT', 'DELETE'];
   private $req = ['path' => '', 'queries' => null];
   private $responses = [];
+  private $matched_routes = [];
 
   function __construct(string $path_base) {
     $url = parse_url(str_replace($path_base, "", $_SERVER['REQUEST_URI']));
@@ -26,18 +27,32 @@ class Router {
           break;
 
         default:
-          respond('server error: requested path matching mutiple routes', 500);
+          respond(
+            'server error: requested path matching mutiple routes: ' .
+              json_encode($this->matched_routes),
+            500
+          );
           break;
       }
     });
   }
 
   function __call($method, $args) {
-    if (!in_array(strtoupper($method), $this->valid_methods)) {
-      throw new Exception('invalid method');
-    }
-    if (strtoupper($method) != $_SERVER['REQUEST_METHOD']) {
+    $method = strtoupper($method);
+
+    if (!in_array($method, $this->valid_methods)) {
+      array_push($this->responses, 400);
       return;
+    }
+
+    switch ($_SERVER['REQUEST_METHOD']) {
+      case $method:
+        break;
+      case 'OPTIONS':
+        if ($method == apache_request_headers()['Access-Control-Request-Method'])
+          break;
+      default:
+        return;
     }
 
     [$route, $handle] = $args;
@@ -61,6 +76,12 @@ class Router {
       return;
     }
 
+    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+      header("Access-Control-Allow-Methods: $method");
+      array_push($this->responses, 200);
+      return;
+    }
+
     $req = [
       'args' => array_filter(
         $matches,
@@ -71,6 +92,7 @@ class Router {
     ];
 
     array_push($this->responses, $handle($req));
+    array_push($this->matched_routes, $route);
     // var_export($req);
   }
 }

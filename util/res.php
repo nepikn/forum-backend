@@ -4,7 +4,7 @@ $allowed_origins = ['http://localhost:5173'];
 function respond($body_or_code, $code = 200) {
   array_walk(
     $GLOBALS['allowed_origins'],
-    fn($origin) => header("Access-Control-Allow-Origin: $origin", false)
+    fn ($origin) => header("Access-Control-Allow-Origin: $origin", false)
   );
 
   if (is_numeric($body_or_code)) {
