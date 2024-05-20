@@ -4,8 +4,8 @@ require_once '../util/controller.php';
 require_once '../util/res.php';
 
 class CommentController extends Controller {
-  function get($req) {
-    ['page' => $page, 'commentPerPage' => $commentPerPage] = $req['queries'];
+  function get() {
+    ['page' => $page, 'commentPerPage' => $commentPerPage] = $this->req['queries'];
 
     $result = query(
       'SELECT
@@ -31,6 +31,6 @@ class CommentController extends Controller {
       array_push($comments, $comment);
     }
 
-    return $comments;
+    respond($comments);
   }
 }

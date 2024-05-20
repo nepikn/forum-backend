@@ -5,10 +5,12 @@ class Router {
   private $req = [];
   private $controller;
   private $responded = false;
-  private $responses = [];
+  private $handles = [];
+  // private $responses = [];
   private $matched_routes = [];
 
   function __construct(string $path_base, $controller = null) {
+    // ob_start();
     $url = parse_url(str_replace($path_base, "", $_SERVER['REQUEST_URI']));
 
     $this->req['path'] = @$url['path'] ?? '';
@@ -19,9 +21,7 @@ class Router {
     }
     $this->controller = $controller;
 
-    register_shutdown_function(function () {
-      if (!$this->responded) $this->handleRes();
-    });
+    register_shutdown_function([$this, 'handleRes']);
   }
 
   function __call($route_method, $args) {
@@ -37,16 +37,22 @@ class Router {
     $matches = $this->getRoutePregMatch($route);
     if (!count($matches)) return;
 
-    $req = [
-      'args' => array_filter(
-        $matches,
-        fn ($key) => is_string($key),
-        ARRAY_FILTER_USE_KEY
-      ),
-      ...$this->req,
-    ];
+    $this->req['args'] = array_filter(
+      $matches,
+      fn ($key) => is_string($key),
+      ARRAY_FILTER_USE_KEY
+    );
+    // $req = [
+    //   'args' => array_filter(
+    //     $matches,
+    //     fn ($key) => is_string($key),
+    //     ARRAY_FILTER_USE_KEY
+    //   ),
+    //   ...$this->req,
+    // ];
 
-    array_push($this->responses, $handle($route_method, $req));
+    // array_push($this->responses, $handle($route_method, $req));
+    array_push($this->handles, $handle);
     array_push($this->matched_routes, $route);
     // var_export($req);
   }
@@ -65,8 +71,9 @@ class Router {
         return;
 
       case 'OPTIONS':
-        if ($route_method == apache_request_headers()['Access-Control-Request-Method']) {
-          header("Access-Control-Allow-Methods: $route_method");
+        if ($route_method == @apache_request_headers()['Access-Control-Request-Method']) {
+          // header("Access-Control-Allow-Methods: $route_method");
+          respond(headers: ["Access-Control-Allow-Methods: $route_method"]);
           $this->responded = true;
         };
       default:
@@ -94,20 +101,25 @@ class Router {
   }
 
   function handleRes() {
-    switch (count($this->responses)) {
+    if ($this->responded) return;
+    // respond('qq');
+    // return;
+    // if ($err = ob_get_clean()) {
+    //   respond($err);
+    //   return;
+    // }
+
+    switch (count($this->handles)) {
+        // switch (count($this->responses)) {
       case 0:
         $path = $this->req['path'];
         respond("no such path: $path", 404);
         break;
 
       case 1:
-        $res = $this->responses[0];
-        // var_export($res);
-        respond($res);
-        // if (is_array($res)) {
-        //   respond(...$res);
-        // } else {
-        // }
+        // $res = $this->responses[0];
+        $handle = $this->handles[0];
+        $handle($_SERVER['REQUEST_METHOD'], $this->req);
         break;
 
       default:

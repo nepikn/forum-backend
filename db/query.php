@@ -14,3 +14,12 @@ function dbGet($user_id, ...$cols) {
     ->query($sql)
     ->fetch_assoc();
 }
+
+function dbSet($user_id, $col, $value) {
+  // todo
+  return $value;
+}
+
+function dbDelete($user_id) {
+  // todo
+}

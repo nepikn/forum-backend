@@ -2,11 +2,18 @@
 require_once '../controllers/user.php';
 require_once '../util/router.php';
 
-$user = new ClientUserController();
-$router = new Router('/api/user');
+$user_controller = new ClientUserController();
+$router = new Router('/api/user', $user_controller);
 
 // var_export(getallheaders());
-$router->put('/name', [$user, 'putName']);
-// $router->get('', fn () => get_object_vars($user));
-$router->get('', [$user, 'getProps']);
-$router->get('/name', [$user, 'getName']);
+$router->post('');
+$router->get('');
+$router->get('/:prop');
+$router->put('/:prop');
+$router->delete('');
+
+// $router->post('', $user_controller);
+// $router->get('', );
+// $router->get('/:prop', $user_controller);
+// $router->put('/:prop', $user_controller);
+// $router->delete('', $user_controller);
