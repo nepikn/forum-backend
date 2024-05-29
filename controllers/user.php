@@ -28,13 +28,25 @@ class UserController extends Controller {
 
   function get($escape = false) {
     [$user_id, $req_prop, $queries] = $this->getReqInfo();
+    // $req_prop = $req_prop ?? '*';
 
     if ($user_id === null) {
-      respond($req_prop == 'name' ? getSessionUser('name') : null);
-      return;
+      switch ($req_prop) {
+        case 'name':
+          respond(getSessionUser('name'));
+          return;
+
+        case 'signInState':
+          respond($this->err ? 'err' : getDb($queries) !== null);
+          return;
+
+        default:
+          respond('user id is null', 400);
+          return;
+      }
     }
 
-    $result = getDb($user_id, $req_prop ?? '*');
+    $result = getDb(count($queries) ? $queries : $user_id, $req_prop);
     // $name = $escape ? htmlspecialchars($result) : $result;
 
     respond($escape ? htmlspecialchars($result) : $result);

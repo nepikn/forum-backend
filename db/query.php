@@ -9,10 +9,10 @@ function query($sql, ...$values) {
 function getDb($user_cond, ...$cols) {
   global $mysqli;
   $conds = is_array($user_cond) ? $user_cond : ['id' => $user_cond];
-  $col = join(', ', $cols);
+  $col = $cols ? join(', ', $cols) : '*';
   $sql = sprintf("SELECT $col FROM users WHERE %s", join(' AND ', array_map(
-    fn ($key) => sprintf('%s = ?', $key),
-    $conds
+    fn ($key) => "$key = ?",
+    array_keys($conds)
   )));
 
   return $mysqli
