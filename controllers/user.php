@@ -27,14 +27,14 @@ class UserController extends Controller {
   }
 
   function get($escape = false) {
-    [$user_id, $req_prop] = $this->getReqInfo();
+    [$user_id, $req_prop, $queries] = $this->getReqInfo();
 
     if ($user_id === null) {
       respond($req_prop == 'name' ? getSessionUser('name') : null);
       return;
     }
 
-    $result = dbGet($user_id, $req_prop ?? '*');
+    $result = getDb($user_id, $req_prop ?? '*');
     // $name = $escape ? htmlspecialchars($result) : $result;
 
     respond($escape ? htmlspecialchars($result) : $result);
@@ -63,7 +63,7 @@ class UserController extends Controller {
       return;
     }
 
-    respond(dbSet($user_id, $req_prop, $value));
+    respond(setDb($user_id, $req_prop, $value));
   }
 
   function delete() {

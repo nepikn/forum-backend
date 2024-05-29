@@ -6,16 +6,21 @@ function query($sql, ...$values) {
   return $mysqli->query(count($values) ? sprintf($sql, ...$values) : $sql);
 }
 
-function dbGet($user_id, ...$cols) {
+function getDb($user_cond, ...$cols) {
+  global $mysqli;
+  $conds = is_array($user_cond) ? $user_cond : ['id' => $user_cond];
   $col = join(', ', $cols);
-  $sql = "SELECT $col FROM users WHERE id = $user_id";
+  $sql = sprintf("SELECT $col FROM users WHERE %s", join(' AND ', array_map(
+    fn ($key) => sprintf('%s = ?', $key),
+    $conds
+  )));
 
-  return $GLOBALS['mysqli']
-    ->query($sql)
+  return $mysqli
+    ->execute_query($sql, array_values($conds))
     ->fetch_assoc();
 }
 
-function dbSet($user_id, $col, $value) {
+function setDb($user_id, $col, $value) {
   // todo
   return $value;
 }
