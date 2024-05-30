@@ -5,8 +5,20 @@ require_once '../util/res.php';
 require_once '../util/session.php';
 
 class UserController extends Controller {
-  function __construct() {
-    $this->id = getSessionUser('id');
+  // function __construct() {
+  //   $this->id = ;
+  // }
+
+  function post() {
+    [,, $queries] = $this->getReqInfo();
+    $passwd = $queries['passwd'];
+    $id = insertDb([
+      getSessionUser('name'),
+      password_hash($passwd, PASSWORD_DEFAULT)
+    ]);
+
+    setSessionUser('id', $id);
+    respond($id);
   }
 
   function get($escape = false) {
@@ -35,9 +47,9 @@ class UserController extends Controller {
     [$user_id, $req_prop, $queries] = $this->getReqInfo();
     $value = @$queries['value'];
 
-    if (!$value) {
-      respond("no value", 400);
-    } else if ($req_prop == 'id') {
+    if (!$value || $req_prop == 'id') {
+      respond("no value or setting id", 400);
+    } else if (!$req_prop) {
       $db = getDb(['name' => getSessionUser('name')]);
       $matched = password_verify($queries['passwd'], $db['password']);
 
@@ -69,19 +81,9 @@ class UserController extends Controller {
   function getReqInfo() {
     $req = $this->req;
     return [
-      @$req['args']['id'] ?? $this->id,
+      @$req['args']['id'] ?? getSessionUser('id'),
       @$req['args']['prop'],
       $req['queries']
     ];
   }
-}
-
-class ClientUserController extends UserController {
-  function __construct() {
-    parent::__construct();
-  }
-
-  // function getProps() {
-  //   return get_object_vars($this);
-  // }
 }

@@ -12,8 +12,8 @@ function getSessionUser(string $prop = null) {
   return $prop ? $user[$prop] : $user;
 }
 
-function setSessionUser($name, $value) {
-  $_SESSION['user'][$name] = $value;
+function setSessionUser($key, $value) {
+  $_SESSION['user'][$key] = $value;
   return $value;
 }
 
