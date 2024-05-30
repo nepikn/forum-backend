@@ -5,49 +5,28 @@ require_once '../util/res.php';
 require_once '../util/session.php';
 
 class UserController extends Controller {
-  public $name;
-  private $err;
-  private $password;
-  // private $src;
-
   function __construct() {
-    // $this->src=getSessionUser('id')===null?;
-    $session_user = getSessionUser();
-    $this->id = $session_user['id'];
-    // $session_user_id = $session_user['id'];
-    // $props = $session_user_id ?
-    //   $this->queryDb('*', $session_user_id)
-    //   : $session_user;
-
-    // foreach ($props as $key => $value) {
-    //   // foreach ($session_user as $key => $value) {
-    //   // foreach (getSessionUser() as $key => $value) {
-    //   $this->$key = $value;
-    // }
+    $this->id = getSessionUser('id');
   }
 
   function get($escape = false) {
     [$user_id, $req_prop, $queries] = $this->getReqInfo();
-    // $req_prop = $req_prop ?? '*';
 
     if ($user_id === null) {
       switch ($req_prop) {
-        case 'name':
-          respond(getSessionUser('name'));
-          return;
-
         case 'authState':
-          respond($this->err ? 'err' : getDb($queries) !== null);
+          respond(getSessionUser('err') ?
+            'err'
+            : getDb(['name' => getSessionUser('name')]) !== null);
           return;
 
         default:
-          respond('user id is null', 400);
+          respond(getSessionUser($req_prop));
           return;
       }
     }
 
     $result = getDb(count($queries) ? $queries : $user_id, $req_prop);
-    // $name = $escape ? htmlspecialchars($result) : $result;
 
     respond($escape ? htmlspecialchars($result) : $result);
   }
@@ -56,37 +35,35 @@ class UserController extends Controller {
     [$user_id, $req_prop, $queries] = $this->getReqInfo();
     $value = @$queries['value'];
 
-    if (in_array($req_prop, ['id'])) {
-      respond("invalid prop: $req_prop", 400);
-      return;
-    }
     if (!$value) {
       respond("no value", 400);
-      return;
-    }
+    } else if ($req_prop == 'id') {
+      $db = getDb(['name' => getSessionUser('name')]);
+      $matched = password_verify($queries['passwd'], $db['password']);
 
-    // $value = json_decode($value);
-    if ($user_id === null) {
+      setSessionUser('id', $matched ? $db['id'] : null);
+      setSessionUser('err', !$matched);
+
+      respond();
+    } else if ($user_id === null) {
       if ($req_prop != 'name') {
         respond("setting $req_prop while no user id is invalid", 400);
       } else {
         respond(setSessionUser('name', $value));
       }
-      return;
+    } else {
+      respond(setDb($user_id, $req_prop, $value));
     }
-
-    respond(setDb($user_id, $req_prop, $value));
   }
 
   function delete() {
     [$user_id] = $this->getReqInfo();
 
     if ($user_id === null) {
-      respond(setSessionUser('name', null));
-      return;
+      respond(delSessionUser());
+    } else {
+      respond(dbDelete($user_id));
     }
-
-    respond(dbDelete($user_id));
   }
 
   function getReqInfo() {
@@ -97,34 +74,6 @@ class UserController extends Controller {
       $req['queries']
     ];
   }
-
-  // function handleNullIdUser(callable $handle_session_user) {
-  //   [$user_id, $req_prop] = $this->getReqInfo();
-
-  //   if ($user_id === null) {
-  //     $handle_session_user($req_prop);
-  //     // if ($req_prop == 'name') {
-  //     //   respond($handle_session_user('name'));
-  //     // }
-  //     // respond(null);
-  //     return true;
-  //   }
-  // }
-
-  // function setName($req) {
-  //   $name = $req['queries']['name'];
-
-  //   $_SESSION['user_name'] = $name;
-  //   // $_SESSION['user_name'] = '1';
-  //   // setSessionUser('name', $name);
-  //   // if ($this->id === null) {
-  //   // } else {
-  //   //   // todo
-  //   // }
-
-  //   return $_SESSION['user_name'];
-  //   return getSessionUser()['name'];
-  // }
 }
 
 class ClientUserController extends UserController {

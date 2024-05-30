@@ -16,3 +16,7 @@ function setSessionUser($name, $value) {
   $_SESSION['user'][$name] = $value;
   return $value;
 }
+
+function delSessionUser() {
+  unset($_SESSION['user']);
+}

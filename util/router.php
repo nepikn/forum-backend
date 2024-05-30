@@ -17,7 +17,7 @@ class Router {
     if (@$url['query']) {
       parse_str($url['query'], $this->req['queries']);
     } else {
-      $this->req['queries'] = null;
+      $this->req['queries'] = [];
     }
     $this->controller = $controller;
 
