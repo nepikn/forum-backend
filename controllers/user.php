@@ -36,7 +36,7 @@ class UserController extends Controller {
           respond(getSessionUser('name'));
           return;
 
-        case 'signInState':
+        case 'authState':
           respond($this->err ? 'err' : getDb($queries) !== null);
           return;
 
