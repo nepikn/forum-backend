@@ -18,5 +18,7 @@ function setSessionUser($key, $value) {
 }
 
 function delSessionUser() {
-  unset($_SESSION['user']);
+  // unset($_SESSION['user']);
+  session_destroy();
+  // return 200;
 }

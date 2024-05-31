@@ -2,7 +2,7 @@
 
 class Router {
   static $valid_methods = ['POST', 'GET', 'PUT', 'DELETE'];
-  private $req = [];
+  private $req = ['path' => '', 'args' => [], 'queries' => []];
   private $controller;
   private $responded = false;
   private $handles = [];
@@ -16,8 +16,6 @@ class Router {
     $this->req['path'] = @$url['path'] ?? '';
     if (@$url['query']) {
       parse_str($url['query'], $this->req['queries']);
-    } else {
-      $this->req['queries'] = [];
     }
     $this->controller = $controller;
 
@@ -42,14 +40,6 @@ class Router {
       fn ($key) => is_string($key),
       ARRAY_FILTER_USE_KEY
     );
-    // $req = [
-    //   'args' => array_filter(
-    //     $matches,
-    //     fn ($key) => is_string($key),
-    //     ARRAY_FILTER_USE_KEY
-    //   ),
-    //   ...$this->req,
-    // ];
 
     // array_push($this->responses, $handle($route_method, $req));
     array_push($this->handles, $handle);

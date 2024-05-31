@@ -5,9 +5,8 @@ require_once '../util/res.php';
 require_once '../util/session.php';
 
 class UserController extends Controller {
-  // function __construct() {
-  //   $this->id = ;
-  // }
+  function __construct() {
+  }
 
   function post() {
     [,, $queries] = $this->getReqInfo();
@@ -27,9 +26,11 @@ class UserController extends Controller {
     if ($user_id === null) {
       switch ($req_prop) {
         case 'authState':
-          respond(getSessionUser('err') ?
-            'err'
-            : getDb(['name' => getSessionUser('name')]) !== null);
+          respond(
+            getSessionUser('err') ?
+              'err'
+              : getDb(['name' => getSessionUser('name')]) !== null
+          );
           return;
 
         default:
@@ -47,16 +48,16 @@ class UserController extends Controller {
     [$user_id, $req_prop, $queries] = $this->getReqInfo();
     $value = @$queries['value'];
 
-    if (!$value || $req_prop == 'id') {
-      respond("no value or setting id", 400);
-    } else if (!$req_prop) {
+    if (!$req_prop) {
       $db = getDb(['name' => getSessionUser('name')]);
       $matched = password_verify($queries['passwd'], $db['password']);
 
       setSessionUser('id', $matched ? $db['id'] : null);
       setSessionUser('err', !$matched);
 
-      respond();
+      respond([$queries['passwd'], $db['password']]);
+    } else if (!$value || $req_prop == 'id') {
+      respond("no value or setting id", 400);
     } else if ($user_id === null) {
       if ($req_prop != 'name') {
         respond("setting $req_prop while no user id is invalid", 400);
@@ -71,10 +72,10 @@ class UserController extends Controller {
   function delete() {
     [$user_id] = $this->getReqInfo();
 
-    if ($user_id === null) {
+    if ($user_id === null || $this->req['path'] == '/session') {
       respond(delSessionUser());
     } else {
-      respond(dbDelete($user_id));
+      // respond(dbDelete($user_id));
     }
   }
 
