@@ -8,7 +8,8 @@ CREATE TABLE users (
   id INT UNSIGNED AUTO_INCREMENT,
   name VARCHAR(9),
   password VARCHAR(255),
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE (name)
 );
 
 DROP TABLE IF EXISTS comments;

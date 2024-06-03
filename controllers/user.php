@@ -39,13 +39,13 @@ class UserController extends Controller {
     if (!$value || $req_prop == 'id') {
       respond("no value or setting id", 400);
     } else if ($user_id === null) {
-      if ($req_prop != 'name') {
-        respond("setting $req_prop while no user id is invalid", 400);
-      } else {
-        respond(setSessionUser('name', $value));
-      }
+      respond(setSessionUser('name', $value));
     } else {
-      respond(setDb($user_id, $req_prop, $value));
+      respond($this->db->update(
+        $req_prop,
+        $value,
+        ['id' => $user_id]
+      ));
     }
   }
 

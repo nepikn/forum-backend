@@ -3,12 +3,14 @@ require_once '../util/controller.php';
 
 class SessionController extends Controller {
   function __construct() {
-    $this->db = new Db('users');
+    $this->db = new Db('users', [
+      'name' => getSessionUser('name')
+    ]);
   }
 
   function post() {
     $queries = $this->req['queries'];
-    $db = $this->db->get(['name' => getSessionUser('name')]);
+    $db = $this->db->get();
     $matched = password_verify($queries['passwd'], $db['password']);
 
     setSessionUser('id', $matched ? $db['id'] : null);
@@ -23,7 +25,7 @@ class SessionController extends Controller {
         respond(
           getSessionUser('err') ?
             'err'
-            : (getDb(['name' => getSessionUser('name')]) === null ?
+            : ($this->db->get() === null ?
               'signUp'
               : 'signIn')
         );

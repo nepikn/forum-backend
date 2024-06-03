@@ -21,12 +21,12 @@ class Db {
       array_values($props)
     );
 
-    return $this->query('SELECT LAST_INSERT_ID() AS id', bind: false)['id'];
+    return $this->query('SELECT LAST_INSERT_ID() AS id')['id'];
   }
 
   function get($conds = [], $cols = [],) {
-    $col = count($cols) ? join(', ', $cols) : '*';
     $conds = count($conds) ? $conds : $this->default_conds;
+    $col = count($cols) ? join(', ', $cols) : '*';
 
     $result = $this->query(
       "SELECT $col FROM %s %s",
@@ -41,27 +41,34 @@ class Db {
     return count($cols) == 1 ? $result[$col] : $result;
   }
 
-  function setDb($user_id, $col, $value) {
-    // todo
+  function update($col, $val, $conds) {
+    return $this->query('UPDATE %s SET %s = ? %s', [
+      $this->table,
+      $col,
+      Sql::where($conds)
+    ], [
+      $val, ...array_values($conds)
+    ]);
   }
 
   function dbDelete($user_id) {
     // todo
   }
 
-  function query($sql_format, $format_vals = [], $params = [], $bind = true) {
+  function query($sql_format, $format_vals = [], $params = []) {
     global $mysqli;
 
     $sql = count($format_vals) ? sprintf($sql_format, ...$format_vals) : $sql_format;
 
     try {
-      return ($bind ?
+      $result = count($params) ?
         $mysqli->execute_query($sql, $params)
-        : $mysqli->query(sprintf($sql, $params)))
-        ->fetch_assoc();
+        : $mysqli->query($sql);
     } catch (\Throwable $th) {
       return $th->getMessage();
     };
+
+    return is_bool($result) ? $result : $result->fetch_assoc();
   }
 }
 
