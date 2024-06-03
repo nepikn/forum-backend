@@ -4,8 +4,9 @@ require_once '../util/res.php';
 require_once '../util/session.php';
 
 class Controller {
-  protected $req;
   public $id;
+  protected Db $db;
+  protected $req;
 
   function __invoke($method, $req) {
     // $id = @$req['queries']['id'] ?? $this->id;

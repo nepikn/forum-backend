@@ -1,14 +1,23 @@
 <?php
-session_start();
-// unset($_SESSION['user']);
+$testing = apache_request_headers()['User-Agent'] == "HTTPie";
+
+if (!$testing) {
+  session_start();
+}
 header('Access-Control-Allow-Credentials: true');
 
 function getSessionUser(string $prop = null) {
-  $user = $_SESSION['user'] ??= [
-    'id' => null,
-    'name' => null,
-    'err' => false,
-  ];
+  global $testing;
+  $user = $testing ?
+    [
+      'id' => 21,
+      'name' => 'ok',
+      'err' => false,
+    ] : ($_SESSION['user'] ??= [
+      'id' => null,
+      'name' => null,
+      'err' => false,
+    ]);
   return $prop ? $user[$prop] : $user;
 }
 

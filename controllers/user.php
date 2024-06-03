@@ -3,14 +3,14 @@ require_once '../util/controller.php';
 
 class UserController extends Controller {
   function __construct() {
+    $this->db = new Db('users');
   }
 
   function post() {
-    [,, $queries] = $this->getReqInfo();
-    $passwd = $queries['passwd'];
-    $id = insertDb([
-      getSessionUser('name'),
-      password_hash($passwd, PASSWORD_DEFAULT)
+    $passwd = $this->req['queries']['passwd'];
+    $id = $this->db->insert([
+      'name' => getSessionUser('name'),
+      'password' => password_hash($passwd, PASSWORD_DEFAULT)
     ]);
 
     setSessionUser('id', $id);
@@ -23,7 +23,10 @@ class UserController extends Controller {
     if ($user_id === null) {
       respond(getSessionUser($req_prop));
     } else {
-      $result = getDb(count($queries) ? $queries : $user_id, $req_prop);
+      $result = $this->db->get(
+        count($queries) ? $queries : ['id' => $user_id],
+        [$req_prop],
+      );
 
       respond($escape ? htmlspecialchars($result) : $result);
     }

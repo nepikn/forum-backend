@@ -3,11 +3,12 @@ require_once '../util/controller.php';
 
 class SessionController extends Controller {
   function __construct() {
+    $this->db = new Db('users');
   }
 
   function post() {
     $queries = $this->req['queries'];
-    $db = getDb(['name' => getSessionUser('name')]);
+    $db = $this->db->get(['name' => getSessionUser('name')]);
     $matched = password_verify($queries['passwd'], $db['password']);
 
     setSessionUser('id', $matched ? $db['id'] : null);
