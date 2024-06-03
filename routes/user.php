@@ -8,10 +8,8 @@ $router = new Router('/api/user', $user_controller);
 $router->post('');
 $router->get('');
 $router->get('/:prop');
-$router->put('');
 $router->put('/:prop');
 $router->delete('');
-$router->delete('/session');
 
 // $router->post('', $user_controller);
 // $router->get('', );
