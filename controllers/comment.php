@@ -4,6 +4,17 @@ require_once '../util/controller.php';
 require_once '../util/res.php';
 
 class CommentController extends Controller {
+  function __construct() {
+    $this->db = new Db('comments');
+  }
+
+  function post() {
+    respond($this->db->insert([
+      'user_id' => getSessionUser('id'),
+      'content' => $this->req['queries']['content']
+    ]));
+  }
+
   function get() {
     ['page' => $page, 'commentPerPage' => $commentPerPage] = $this->req['queries'];
 
