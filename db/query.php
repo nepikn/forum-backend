@@ -11,43 +11,47 @@ class Db {
   }
 
   function insert($props) {
-    $this->query(
+    $result = $this->query(
       'INSERT INTO %s (%s) VALUES (%s)',
       [
-        $this->table,
-        join(', ', array_keys($props)),
-        '?' . str_repeat(', ?', count($props) - 1)
-      ],
-      array_values($props)
+        'format_vals' => [
+          $this->table,
+          join(', ', array_keys($props)),
+          '?' . str_repeat(', ?', count($props) - 1)
+        ],
+        'params' => array_values($props)
+      ]
     );
 
-    return $this->query('SELECT LAST_INSERT_ID() AS id')['id'];
+    if ($result === true) {
+      return $this->query('SELECT LAST_INSERT_ID() AS id')['id'];
+    } else {
+      return $result;
+    }
   }
 
-  function get($conds = [], $cols = [],) {
+  function get($conds = [], $cols = []) {
     $conds = count($conds) ? $conds : $this->default_conds;
     $col = count($cols) ? join(', ', $cols) : '*';
 
     $result = $this->query(
-      "SELECT $col FROM %s %s",
+      "SELECT $col FROM %s",
       [
-        $this->table,
-        Sql::where($conds)
+        'format_vals' => [
+          $this->table,
+        ],
+        'conds' => $conds,
       ],
-      array_values($conds)
     );
 
-    // return [$cols, $conds];
     return count($cols) == 1 ? $result[$col] : $result;
   }
 
   function update($col, $val, $conds) {
-    return $this->query('UPDATE %s SET %s = ? %s', [
-      $this->table,
-      $col,
-      Sql::where($conds)
-    ], [
-      $val, ...array_values($conds)
+    return $this->query('UPDATE %s SET %s = ?', [
+      'format_vals' => [$this->table, $col],
+      'params' => [$val],
+      'conds' => $conds,
     ]);
   }
 
@@ -55,13 +59,21 @@ class Db {
     // todo
   }
 
-  function query($sql_format, $format_vals = [], $params = []) {
+  function query($sql_format, $options = []) {
     global $mysqli;
+    @[
+      'format_vals' => $format_vals,
+      'params' => $params,
+      'conds' => $conds,
+    ] = $options;
 
-    $sql = count($format_vals) ? sprintf($sql_format, ...$format_vals) : $sql_format;
+    $sql = $format_vals ? sprintf($sql_format, ...$format_vals) : $sql_format;
+    if ($conds && count($conds)) {
+      [$sql, $params] = Sql::where($sql, $params ?? [], $conds);
+    }
 
     try {
-      $result = count($params) ?
+      $result = $params ?
         $mysqli->execute_query($sql, $params)
         : $mysqli->query($sql);
     } catch (\Throwable $th) {
@@ -73,13 +85,14 @@ class Db {
 }
 
 class Sql {
-  static function where($conds) {
-    return count($conds) ?
-      'WHERE ' . join(' AND ', array_map(
+  static function where($sql, $params, $conds) {
+    return [
+      sprintf('%s WHERE %s', $sql, join(' AND ', array_map(
         fn ($key) => "$key = ?",
         array_keys($conds)
-      ))
-      : '';
+      ))),
+      [...$params, ...array_values($conds)]
+    ];
   }
 }
 
