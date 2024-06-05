@@ -6,4 +6,5 @@ $router = new Router('/api/session', new SessionController());
 
 $router->post('');
 $router->get('/:prop');
+$router->put('');
 $router->delete('');

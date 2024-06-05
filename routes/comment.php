@@ -8,7 +8,7 @@ $router = new Router('/api/comment', new CommentController());
 $router->post('');
 $router->get('');
 $router->get('/:id');
-$router->put('');
+$router->put('/:id');
 $router->delete('');
 
 // $router->post('', $comment_controller);

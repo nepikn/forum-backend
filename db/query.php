@@ -11,52 +11,57 @@ class Db {
   }
 
   function insert($props) {
-    $result = $this->query(
-      'INSERT INTO %s (%s) VALUES (%s)',
+    return $this->handleQuery(
+      "INSERT INTO $this->table (%s) VALUES (%s)",
       [
         'format_vals' => [
-          $this->table,
           join(', ', array_keys($props)),
           '?' . str_repeat(', ?', count($props) - 1)
         ],
-        'params' => array_values($props)
-      ]
+        'params' => array_values($props),
+      ],
+      fn () => $this->query('SELECT LAST_INSERT_ID() AS id')['id'],
     );
-
-    if ($result === true) {
-      return $this->query('SELECT LAST_INSERT_ID() AS id')['id'];
-    } else {
-      return $result;
-    }
   }
 
   function get($conds = [], $cols = []) {
     $conds = count($conds) ? $conds : $this->default_conds;
     $col = count($cols) ? join(', ', $cols) : '*';
 
-    $result = $this->query(
-      "SELECT $col FROM %s",
+    return $this->handleQuery(
+      "SELECT $col FROM $this->table",
       [
-        'format_vals' => [
-          $this->table,
-        ],
         'conds' => $conds,
       ],
+      function ($result) use ($cols, $col) {
+        return count($cols) == 1 ? $result[$col] : $result;
+      },
     );
-
-    return count($cols) == 1 ? $result[$col] : $result;
   }
 
-  function update($col, $val, $conds) {
-    return $this->query('UPDATE %s SET %s = ?', [
-      'format_vals' => [$this->table, $col],
-      'params' => [$val],
+  function update($props, $conds) {
+    $assignment = join(', ', array_map(
+      fn ($key) => "$key = ?",
+      array_keys($props)
+    ));
+
+    return $this->handleQuery("UPDATE $this->table SET %s", [
+      'format_vals' => [$assignment],
+      'params' => array_values($props),
       'conds' => $conds,
     ]);
   }
 
   function dbDelete($user_id) {
     // todo
+  }
+
+  function handleQuery($sql_format, $options = [], callable $getResource = null) {
+    $val_or_err = $this->query($sql_format, $options);
+
+    return $val_or_err instanceof \Throwable || empty($getResource) ?
+      $val_or_err
+      : $getResource($val_or_err);
   }
 
   function query($sql_format, $options = []) {
@@ -77,10 +82,12 @@ class Db {
         $mysqli->execute_query($sql, $params)
         : $mysqli->query($sql);
     } catch (\Throwable $th) {
-      return $th->getMessage();
-    };
+      return $th;
+    }
 
-    return is_bool($result) ? $result : $result->fetch_assoc();
+    return $result === false ?
+      new Exception()
+      : ($result === true ? null : $result->fetch_assoc());
   }
 }
 

@@ -25,4 +25,12 @@ class Controller {
     $this->req = $req;
     return $this->$method();
   }
+
+  function respond($val_or_err = null) {
+    if ($val_or_err instanceof \Throwable) {
+      respond(@$val_or_err->getMessage(), 500);
+    } else {
+      respond($val_or_err);
+    }
+  }
 }

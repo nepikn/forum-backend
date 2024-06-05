@@ -7,7 +7,7 @@ $router = new Router('/api/user', new UserController());
 $router->post('');
 $router->get('');
 $router->get('/:prop');
-$router->put('/:prop');
+$router->put('');
 $router->delete('');
 
 // $router->post('', $user_controller);

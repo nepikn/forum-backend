@@ -14,36 +14,35 @@ class UserController extends Controller {
     ]);
 
     setSessionUser('id', $id);
-    respond($id);
+    parent::respond($id);
   }
 
   function get($escape = false) {
     [$user_id, $req_prop, $queries] = $this->getReqInfo();
 
     if ($user_id === null) {
-      respond(getSessionUser($req_prop));
+      parent::respond(getSessionUser($req_prop));
     } else {
       $result = $this->db->get(
         count($queries) ? $queries : ['id' => $user_id],
         [$req_prop],
       );
 
-      respond($escape ? htmlspecialchars($result) : $result);
+      parent::respond($result);
+      // parent::respond($escape ? htmlspecialchars($result) : $result);
     }
   }
 
   function put() {
-    [$user_id, $req_prop, $queries] = $this->getReqInfo();
-    $value = @$queries['value'];
+    [$user_id,, $queries] = $this->getReqInfo();
 
-    if (!$value || $req_prop == 'id') {
-      respond("no value or setting id", 400);
+    if (!count($queries)) {
+      respond("no queries", 400);
     } else if ($user_id === null) {
-      respond(setSessionUser('name', $value));
+      respond("no user id", 400);
     } else {
-      respond($this->db->update(
-        $req_prop,
-        $value,
+      parent::respond($this->db->update(
+        $queries,
         ['id' => $user_id]
       ));
     }
@@ -55,7 +54,7 @@ class UserController extends Controller {
     if ($user_id === null) {
       respond('no user id', 400);
     } else {
-      // respond(dbDelete($user_id));
+      // parent::respond(dbDelete($user_id));
     }
   }
 

@@ -16,13 +16,13 @@ class SessionController extends Controller {
     setSessionUser('id', $matched ? $db['id'] : null);
     setSessionUser('err', !$matched);
 
-    respond($matched);
+    parent::respond($matched);
   }
 
   function get() {
     switch ($this->req['args']['prop']) {
       case 'authState':
-        respond(
+        parent::respond(
           getSessionUser('err') ?
             'err'
             : ($this->db->get() === null ?
@@ -37,7 +37,19 @@ class SessionController extends Controller {
     }
   }
 
+  function put() {
+    ['queries' => $queries] = $this->req;
+
+    if (!count($queries)) {
+      respond("no queries", 400);
+    } else if (getSessionUser('id') !== null) {
+      respond("has user id", 400);
+    } else {
+      parent::respond(setSessionUser('name', $queries['name']));
+    }
+  }
+
   function delete() {
-    respond(delSessionUser());
+    parent::respond(delSessionUser());
   }
 }

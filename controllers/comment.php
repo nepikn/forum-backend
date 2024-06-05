@@ -9,7 +9,7 @@ class CommentController extends Controller {
   }
 
   function post() {
-    respond($this->db->insert([
+    parent::respond($this->db->insert([
       'user_id' => getSessionUser('id'),
       'content' => $this->req['queries']['content']
     ]));
@@ -42,6 +42,10 @@ class CommentController extends Controller {
       array_push($comments, $comment);
     }
 
-    respond($comments);
+    parent::respond($comments);
+  }
+
+  function put() {
+    parent::respond($this->db->update($this->req['queries'], $this->req['args']));
   }
 }

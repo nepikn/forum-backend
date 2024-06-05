@@ -30,8 +30,6 @@ function setSessionUser($key, $value) {
   if (!$testing) {
     $_SESSION['user'][$key] = $value;
   }
-
-  return $value;
 }
 
 function delSessionUser() {
