@@ -24,9 +24,9 @@ class Db {
     );
   }
 
-  function get($conds = [], $cols = []) {
+  function get($conds = [], $cols = null) {
     $conds = count($conds) ? $conds : $this->default_conds;
-    $col = count($cols) ? join(', ', $cols) : '*';
+    $col = is_array($cols) ? join(', ', $cols) : $cols ?? '*';
 
     return $this->handleQuery(
       "SELECT $col FROM $this->table",
@@ -34,7 +34,7 @@ class Db {
         'conds' => $conds,
       ],
       function ($result) use ($cols, $col) {
-        return count($cols) == 1 ? $result[$col] : $result;
+        return is_array($cols) && count($cols) == 1 ? $result[$col] : $result;
       },
     );
   }

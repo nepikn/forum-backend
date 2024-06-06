@@ -25,9 +25,10 @@ class UserController extends Controller {
     } else {
       $result = $this->db->get(
         count($queries) ? $queries : ['id' => $user_id],
-        [$req_prop],
+        $req_prop,
       );
 
+      // parent::respond($req_prop);
       parent::respond($result);
       // parent::respond($escape ? htmlspecialchars($result) : $result);
     }
