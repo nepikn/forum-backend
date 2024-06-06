@@ -45,11 +45,17 @@ class Db {
       array_keys($props)
     ));
 
-    return $this->handleQuery("UPDATE $this->table SET %s", [
-      'format_vals' => [$assignment],
-      'params' => array_values($props),
-      'conds' => $conds,
-    ]);
+    return $this->handleQuery(
+      "UPDATE $this->table SET %s",
+      [
+        'format_vals' => [$assignment],
+        'params' => array_values($props),
+        'conds' => $conds,
+      ],
+      function () use ($props) {
+        return count($props) == 1 ? array_values($props)[0] : $props;
+      }
+    );
   }
 
   function dbDelete($user_id) {
