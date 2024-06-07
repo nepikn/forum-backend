@@ -58,8 +58,13 @@ class Db {
     );
   }
 
-  function dbDelete($user_id) {
-    // todo
+  function delete($id) {
+    return $this->handleQuery(
+      "DELETE FROM $this->table",
+      [
+        'conds' => ['id' => $id],
+      ],
+    );
   }
 
   function handleQuery($sql_format, $options = [], callable $getResource = null) {

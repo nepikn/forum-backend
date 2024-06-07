@@ -2,20 +2,13 @@
 require_once '../controllers/comment.php';
 require_once '../util/router.php';
 
-// $comment_controller = new CommentController();
 $router = new Router('/api/comment', new CommentController());
 
 $router->post('');
 $router->get('');
 $router->get('/:id');
 $router->put('/:id');
-$router->delete('');
-
-// $router->post('', $comment_controller);
-// $router->get('');
-// $router->get('/:id', $comment_controller);
-// $router->put('', $comment_controller);
-// $router->delete('', $comment_controller);
+$router->delete('/:id');
 
 function printComment($comment, $byCurrentUser) {
   $user_inputs = [$comment['user_name'], $comment['content']];

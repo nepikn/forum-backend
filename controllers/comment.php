@@ -48,4 +48,8 @@ class CommentController extends Controller {
   function put() {
     parent::respond($this->db->update($this->req['queries'], $this->req['args']));
   }
+
+  function delete() {
+    parent::respond($this->db->delete($this->req['args']['id']));
+  }
 }
