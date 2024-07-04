@@ -16,24 +16,29 @@ class CommentController extends Controller {
   }
 
   function get() {
-    ['page' => $page, 'commentPerPage' => $commentPerPage] = $this->req['queries'];
+    @[
+      'page' => $page,
+      'commentPerPage' => $commentPerPage,
+      'cursor' => $cursor
+    ] = $this->req['queries'];
 
     $result = query(
-      'SELECT
-      SQL_CALC_FOUND_ROWS *
-    FROM
-      comments AS c
-      INNER JOIN (
-        SELECT
-          id AS user_id,
-          name AS commentator
-        FROM
-          users
-      ) AS u ON c.user_id = u.user_id
-    WHERE is_deleted IS NULL -- if soft deleting
-    ORDER BY
-      c.id DESC
-    LIMIT %d, %d',
+      "SELECT
+        SQL_CALC_FOUND_ROWS *
+      FROM
+        comments AS c
+        INNER JOIN (
+          SELECT
+            id AS user_id,
+            name AS commentator
+          FROM
+            users
+        ) AS u ON c.user_id = u.user_id
+      -- WHERE is_deleted IS NULL -- if soft deleting
+      -- AND c.id <= $cursor -- todo: cursor-based pagination
+      ORDER BY
+        c.id DESC
+      LIMIT %d, %d",
       ($page - 1) * $commentPerPage,
       $commentPerPage
     );
