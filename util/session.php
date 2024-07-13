@@ -1,15 +1,18 @@
 <?php
-$testing = apache_request_headers()['User-Agent'] == "HTTPie";
+$testing = empty($_GET['PHPSESSID']) && apache_request_headers()['User-Agent'] == "HTTPie";
 $test_user = [
-  'id' => 34,
+  'id' => 1,
   'name' => 'ok',
   'err' => false,
 ];
 
 if (!$testing) {
+  header('Access-Control-Allow-Credentials: true');
+  ini_set('session.cookie_samesite', 'None');
+  ini_set('session.cookie_secure', 'On');
+
   session_start();
 }
-header('Access-Control-Allow-Credentials: true');
 
 function getSessionUser(string $prop = null) {
   global $testing, $test_user;
