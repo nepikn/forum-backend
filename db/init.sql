@@ -1,4 +1,8 @@
+CREATE USER IF NOT EXISTS 'admin' @'localhost' IDENTIFIED BY 'auth_string';
+
 CREATE DATABASE IF NOT EXISTS forum;
+
+GRANT ALL ON forum.* TO 'admin' @'localhost';
 
 USE forum;
 
