@@ -6,12 +6,10 @@ class Router {
   private $controller;
   private $responded = false;
   private $handles = [];
-  // private $responses = [];
   private $matched_routes = [];
 
-  function __construct(string $path_base, $controller = null) {
-    // ob_start();
-    $url = parse_url(str_replace($path_base, "", $_SERVER['REQUEST_URI']));
+  function __construct(string $slug, $controller = null) {
+    $url = parse_url(str_replace(getenv('API_BASE') . "/$slug", "", $_SERVER['REQUEST_URI']));
 
     $this->req['path'] = @$url['path'] ?? '';
     if (@$url['query']) {
@@ -41,10 +39,8 @@ class Router {
       ARRAY_FILTER_USE_KEY
     );
 
-    // array_push($this->responses, $handle($route_method, $req));
     array_push($this->handles, $handle);
     array_push($this->matched_routes, $route);
-    // var_export($req);
   }
 
   function handleInvalidMethod($route_method) {
@@ -62,7 +58,6 @@ class Router {
 
       case 'OPTIONS':
         if ($route_method == @apache_request_headers()['Access-Control-Request-Method']) {
-          // header("Access-Control-Allow-Methods: $route_method");
           respond(headers: ["Access-Control-Allow-Methods: $route_method"]);
           $this->responded = true;
         };
@@ -92,22 +87,14 @@ class Router {
 
   function handleRes() {
     if ($this->responded) return;
-    // respond('qq');
-    // return;
-    // if ($err = ob_get_clean()) {
-    //   respond($err);
-    //   return;
-    // }
 
     switch (count($this->handles)) {
-        // switch (count($this->responses)) {
       case 0:
         $path = $this->req['path'];
         respond("no such path: $path", 404);
         break;
 
       case 1:
-        // $res = $this->responses[0];
         $handle = $this->handles[0];
         $handle($_SERVER['REQUEST_METHOD'], $this->req);
         break;

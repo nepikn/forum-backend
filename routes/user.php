@@ -2,7 +2,7 @@
 require_once '../controllers/user.php';
 require_once '../util/router.php';
 
-$router = new Router('/api/user', new UserController());
+$router = new Router('user', new UserController());
 
 $router->post('');
 $router->get('');

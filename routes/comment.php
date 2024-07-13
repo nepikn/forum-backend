@@ -2,7 +2,7 @@
 require_once '../controllers/comment.php';
 require_once '../util/router.php';
 
-$router = new Router('/api/comment', new CommentController());
+$router = new Router('comment', new CommentController());
 
 $router->post('');
 $router->get('');

@@ -3,7 +3,7 @@
 function respond($body = null, $code = 200, $headers = []) {
   $origin = @apache_request_headers()['Origin'];
   if (isset($origin)) {
-    $allowed_origins = ['http://localhost:5173', 'http://localhost:4173'];
+    $allowed_origins = explode(',', getenv('ALLOWED_ORIGINS'));
     if (!in_array($origin, $allowed_origins)) return;
 
     header("Access-Control-Allow-Origin: $origin");
@@ -15,10 +15,5 @@ function respond($body = null, $code = 200, $headers = []) {
     fn ($header) => header($header, false)
   );
 
-  // echo json_encode(in_array($origin, $allowed_origins));
   echo json_encode($body);
-}
-
-function hasRespond() {
-  // todo
 }
