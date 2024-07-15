@@ -2,14 +2,17 @@
 $testing = empty($_GET['PHPSESSID']) && apache_request_headers()['User-Agent'] == "HTTPie";
 $test_user = [
   'id' => 1,
-  'name' => 'ok',
+  'name' => 'fox',
   'err' => false,
 ];
 
 if (!$testing) {
   header('Access-Control-Allow-Credentials: true');
-  ini_set('session.cookie_samesite', 'None');
-  ini_set('session.cookie_secure', 'On');
+
+  if (str_starts_with(@apache_request_headers()['Origin'], 'http://localhost')) {
+    ini_set('session.cookie_samesite', 'None');
+    ini_set('session.cookie_secure', 'On');
+  }
 
   session_start();
 }
