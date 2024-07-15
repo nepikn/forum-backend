@@ -19,7 +19,7 @@ mkdir api
 mv forum-backend/ api/forum/
 cd api/forum/
 
-sudo ln -f -s .conf /etc/apache2/conf-available/api-forum.conf
+sudo ln -s $(realpath .conf) /etc/apache2/conf-available/api-forum.conf
 sudo a2enconf api-forum.conf
 sudo systemctl restart apache2
 
