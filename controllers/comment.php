@@ -22,9 +22,14 @@ class CommentController extends Controller {
       'cursor' => $cursor
     ] = $this->req['queries'];
 
+    if ($this->req['path'] == '/length') {
+      parent::respond(query('SELECT COUNT(*) FROM comments')->fetch_column());
+      return;
+    }
+
     $result = query(
       "SELECT
-        SQL_CALC_FOUND_ROWS *
+        *
       FROM
         comments AS c
         INNER JOIN (

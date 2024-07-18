@@ -6,7 +6,8 @@ $router = new Router('comment', new CommentController());
 
 $router->post('');
 $router->get('');
-$router->get('/:id');
+// $router->get('/:id');
+$router->get('/length');
 $router->put('/:id');
 $router->delete('/:id');
 
