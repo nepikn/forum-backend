@@ -1,5 +1,9 @@
 # 留言板 - 後端
 
+前後端分離、部署於 AWS EC2、在 Cloudflare 註冊域名的 MPA
+
+> [前端 Readme](forum-frontend?tab=readme-ov-file#readme-ov-file)
+
 - [API](#api)
 - [主要技術](#主要技術)
 - [安裝](#安裝)
@@ -15,6 +19,7 @@
 
 ## 主要技術
 
+- Apache v2
 - PHP v8
 - MySQL v8
 
@@ -49,6 +54,7 @@ sudo systemctl restart mysql
 
 ## 學習內容
 
+- [學習歷程 - Apache](https://hackmd.io/o_t2Xo_tR-m5VU2Yd2xFsg?view)
 - [學習歷程 - MySQL](https://hackmd.io/IGSwDtGbShqUfFx2O1djTQ?view)
 - [學習歷程 - PHP](https://hackmd.io/brEuH5vtReOs5fh8_X7L6A?view)
 - 藉由 `AliasMatch` 將 HTTP 請求導向 `index.php`
@@ -137,7 +143,6 @@ class Controller {
 
 ```php
 // controllers/comment.php
-<?php
 class CommentController extends Controller {
   function __construct() {
     $this->db = new Db('comments');
