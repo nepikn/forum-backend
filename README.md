@@ -2,7 +2,7 @@
 
 前後端分離、部署於 AWS EC2、在 Cloudflare 註冊域名的 MPA
 
-> [前端 Readme](forum-frontend?tab=readme-ov-file#readme-ov-file)
+> [前端 Readme](../../../forum-frontend?tab=readme-ov-file#readme-ov-file)
 
 - [API](#api)
 - [主要技術](#主要技術)
